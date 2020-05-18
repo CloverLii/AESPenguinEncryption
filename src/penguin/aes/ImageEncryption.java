@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -12,11 +13,13 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class ImageEncryption {
 	private final static String imageName = "Image-Assignment3.bmp";
 	private final static String keyStr = "770A8A65DA156D24EE2A093277530142";
+	private final static String viStr = "1010101010101010";
 	private final static int HEADER_LENGTH = 138;	// examine header length by GHex on Ubuntu
 	private static byte[] header; // store the header of original image
 	private static byte[] originContent; // store the content of image
@@ -46,7 +49,11 @@ public class ImageEncryption {
     /*
      *  Encrypt .bmp image to .jpg image with AES
      */
-    public static byte [] encrypt(byte[] inputByte, String transformation) throws IllegalBlockSizeException, BadPaddingException{
+    public static byte [] encrypt(byte[] srcByte, String transformation) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException{
+    		if(keyStr == null) {
+    			System.out.println("***** The key is null");
+    			return null;
+    		}
     		Cipher cipher = null;
     		try {
     			// create instance of cipher
@@ -55,8 +62,13 @@ public class ImageEncryption {
     	        Key key = new SecretKeySpec(keyStr.getBytes(), "AES");
     	        // update to unlimited
     	        System.out.println( "***** max allowed key length is: " + Cipher.getMaxAllowedKeyLength("AES"));
-    	        // initialize the ciper and set mode
-    	        cipher.init(Cipher.ENCRYPT_MODE, key);
+    	        IvParameterSpec iv = new IvParameterSpec(viStr.getBytes());  
+    	        if(transformation.equals("AES")) {
+        	        // initialize the ciper and set mode
+        	        cipher.init(Cipher.ENCRYPT_MODE, key);
+    	        }else {
+    	        		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+    	        }
 
     		}catch(NoSuchAlgorithmException e) {
     			e.printStackTrace();
@@ -65,7 +77,7 @@ public class ImageEncryption {
     		}catch(InvalidKeyException e) {
     			e.printStackTrace();
     		} 
-	    return cipher.doFinal(inputByte);
+	    return cipher.doFinal(srcByte);
     }
     
     /*
