@@ -2,7 +2,6 @@ package penguin.aes;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -90,7 +89,7 @@ public class ImageEncryption {
     {
 		readImage(imageName);
         saveImage(encrypt(originContent, "AES"), "penguin_ecb.jpg");       
-        saveImage(encrypt(originContent, "AES/CBC/PKCS5Padding"), "penguin_cbc.jpg");     
-    }
-	
+        saveImage(encrypt(originContent, "AES/CBC/PKCS5Padding"), "penguin_cbc.jpg");
+        saveImage(encrypt(originContent, "AES/CFB/PKCS5Padding"), "penguin_cfb.jpg"); 
+    }	
 }
