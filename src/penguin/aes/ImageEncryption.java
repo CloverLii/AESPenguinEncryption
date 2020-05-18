@@ -5,8 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class ImageEncryption {
@@ -41,31 +47,43 @@ public class ImageEncryption {
     /*
      *  Encrypt .bmp image to .jpg image with AES
      */
-    public static byte [] encrypt(byte[] inputByte, String transformation) throws Exception
-    {
-    		// create instance of cipher
-        Cipher cipher = Cipher.getInstance(transformation);
-        // create AES 128bit key using given string
-        Key key = new SecretKeySpec(keyStr.getBytes(), "AES");
-        // update to unlimited
-        System.out.println( "***** max allowed key length is: " + Cipher.getMaxAllowedKeyLength("AES"));
-        // initialize the ciper and set mode
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(inputByte);        
+    public static byte [] encrypt(byte[] inputByte, String transformation) throws IllegalBlockSizeException, BadPaddingException{
+    		Cipher cipher = null;
+    		try {
+    			// create instance of cipher
+    	        cipher = Cipher.getInstance(transformation);
+    	        // create AES 128bit key using given string
+    	        Key key = new SecretKeySpec(keyStr.getBytes(), "AES");
+    	        // update to unlimited
+    	        System.out.println( "***** max allowed key length is: " + Cipher.getMaxAllowedKeyLength("AES"));
+    	        // initialize the ciper and set mode
+    	        cipher.init(Cipher.ENCRYPT_MODE, key);
+
+    		}catch(NoSuchAlgorithmException e) {
+    			e.printStackTrace();
+    		}catch(NoSuchPaddingException e) {
+    			e.printStackTrace();
+    		}catch(InvalidKeyException e) {
+    			e.printStackTrace();
+    		} 
+	    return cipher.doFinal(inputByte);
     }
     
     /*
      * Save encrypted .jpg image to input direction with new name
      */
-    public static void saveImage( byte[] encryptedContent, String newImgName) throws Exception
-    {
-        FileOutputStream fos = new FileOutputStream(newImgName);
-		// Appending the header of original image to make encrypted image available 
-        fos.write(header);
-        fos.write(encryptedContent);
-        fos.flush();
-        // close FileOutPutStream when finished
-        fos.close();    
+    public static void saveImage( byte[] encryptedContent, String newImgName){
+        try{
+        		FileOutputStream fos = new FileOutputStream(newImgName);
+        		// Appending the header of original image to make encrypted image available 
+        		fos.write(header);
+        		fos.write(encryptedContent);
+        		fos.flush();
+        		// close FileOutPutStream when finished
+        		fos.close(); 
+        }catch(IOException e) {
+        		e.printStackTrace();
+        }		   
     }
     
 	public static void main(String[] args) throws Exception 
