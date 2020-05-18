@@ -85,11 +85,12 @@ public class ImageEncryption {
         }		   
     }
     
-	public static void main(String[] args) throws Exception 
-    {
+	public static void main(String[] args) throws Exception{
+		int splitIndex = imageName.lastIndexOf(".");
+		String name = imageName.substring(0, splitIndex);
 		readImage(imageName);
-        saveImage(encrypt(originContent, "AES"), "penguin_ecb.jpg");       
-        saveImage(encrypt(originContent, "AES/CBC/PKCS5Padding"), "penguin_cbc.jpg");
-        saveImage(encrypt(originContent, "AES/CFB/PKCS5Padding"), "penguin_cfb.jpg"); 
+        saveImage(encrypt(originContent, "AES"), name + "_ecb.jpg");       
+        saveImage(encrypt(originContent, "AES/CBC/PKCS5Padding"), name + "_cbc.jpg");
+        saveImage(encrypt(originContent, "AES/CFB/PKCS5Padding"), name + "_cfb.jpg"); 
     }	
 }
